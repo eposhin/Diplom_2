@@ -1,6 +1,6 @@
 import allure
 from helpers.api_requests import login_user, get_user_data, register_user
-from data import EXISTING_USER, MISSING_FIELDS_USER
+from data.data import EXISTING_USER, MISSING_FIELDS_USER
 
 @allure.feature("Создание пользователя")
 @allure.story("Тестирование создания пользователей с различными условиями")
