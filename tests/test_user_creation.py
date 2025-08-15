@@ -6,7 +6,21 @@ from data.data import EXISTING_USER, MISSING_FIELDS_USER
 @allure.story("Тестирование создания пользователей с различными условиями")
 class TestUserCreation:
 
-    @allure.title("Тест создания уникального пользователя")
+    @allure.title('Тест что токен авторизации имеет правильный формат')
+    def test_auth_token_format(self, setup_unique_user):
+        user_data = setup_unique_user
+
+        auth_response = login_user(user_data)
+        assert auth_response.status_code == 200, \
+            f"Ошибка при авторизации: {auth_response.status_code}. Ответ: {auth_response.text}"
+
+        auth_token = auth_response.json().get("accessToken")
+        assert ' ' in auth_token, "Токен должен содержать пробел (например, 'Bearer <token>')"
+
+        token = auth_token.split(' ')[1]
+        assert token, "Токен не должен быть пустым после разделения"
+
+    @allure.title('Тест создание и авторизацию уникального пользователя')
     def test_create_unique_user(self, setup_unique_user):
         user_data = setup_unique_user
 
@@ -15,11 +29,9 @@ class TestUserCreation:
             f"Ошибка при авторизации: {auth_response.status_code}. Ответ: {auth_response.text}"
 
         auth_token = auth_response.json().get("accessToken")
-        token = auth_token.split(' ')[1] if ' ' in auth_token else auth_token
-        assert token, "Токен отсутствует или имеет неверный формат"
+        token = auth_token.split(' ')[1]
 
         response = get_user_data(token)
-
         assert response.status_code == 200, \
             f"Ожидался код 200, получен {response.status_code}. Ответ: {response.text}"
 
